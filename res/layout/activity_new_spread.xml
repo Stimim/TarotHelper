@@ -11,16 +11,13 @@
          TextureView, etc.
     -->
 
-    <TextView
-        android:id="@+id/card_image"
+    <com.stimim.tarothelper.view.PlayGroundView
+        android:id="@+id/play_ground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:background="#000000"
         android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:text="@string/dummy_content" />
 
     <!--
          This FrameLayout insets its children based on system windows using
@@ -33,7 +30,7 @@
         android:fitsSystemWindows="true" >
 
         <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
+            android:id="@+id/new_spread_controls"
             style="?buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,14 +40,21 @@
             tools:ignore="UselessParent" >
 
             <Button
-                android:id="@+id/buttonAddCard"
+                android:id="@+id/button_draw_card"
                 style="?buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/addcard" />
-        </LinearLayout>
+                android:text="@string/draw_card" />
 
+            <Button
+                android:id="@+id/button_clear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/clear" />
+
+        </LinearLayout>
     </FrameLayout>
 
 </FrameLayout>

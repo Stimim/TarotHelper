@@ -1,7 +1,5 @@
 package com.stimim.tarothelper;
 
-import com.stimim.tarothelper.util.SystemUiHider;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -9,11 +7,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+
+import com.stimim.tarothelper.util.SystemUiHider;
+import com.stimim.tarothelper.view.PlayGroundView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
- * 
+ *
  * @see SystemUiHider
  */
 public class NewSpreadActivity extends Activity {
@@ -45,18 +47,21 @@ public class NewSpreadActivity extends Activity {
    */
   private SystemUiHider mSystemUiHider;
 
+  private PlayGroundView mPlayGroundView;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.activity_new_spread);
 
-    final View controlsView = findViewById(R.id.fullscreen_content_controls);
-    final View contentView = findViewById(R.id.card_image);
+    final View controlsView = findViewById(R.id.new_spread_controls);
+    mPlayGroundView = (PlayGroundView) findViewById(R.id.play_ground);
 
+    mPlayGroundView.drawCard();
     // Set up an instance of SystemUiHider to control the system UI for
     // this activity.
-    mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
+    mSystemUiHider = SystemUiHider.getInstance(this, mPlayGroundView, HIDER_FLAGS);
     mSystemUiHider.setup();
     mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
       // Cached values.
@@ -94,7 +99,7 @@ public class NewSpreadActivity extends Activity {
     });
 
     // Set up the user interaction to manually show or hide the system UI.
-    contentView.setOnClickListener(new View.OnClickListener() {
+    mPlayGroundView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         if (TOGGLE_ON_CLICK) {
@@ -108,7 +113,21 @@ public class NewSpreadActivity extends Activity {
     // Upon interacting with UI controls, delay any scheduled hide()
     // operations to prevent the jarring behavior of controls going away
     // while interacting with the UI.
-    findViewById(R.id.buttonAddCard).setOnTouchListener(mDelayHideTouchListener);
+    findViewById(R.id.button_draw_card).setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mPlayGroundView.drawCard();
+        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+      }
+    });
+
+    findViewById(R.id.button_clear).setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mPlayGroundView.reset();
+        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+      }
+    });
   }
 
   @Override

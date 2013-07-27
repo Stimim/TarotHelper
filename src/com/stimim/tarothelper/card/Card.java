@@ -116,7 +116,7 @@ public enum Card {
     return VALUES[id];
   }
 
-  public Card[] tarotCards() {
+  public static Card[] tarotCards() {
     Card[] array = new Card[78];
     for (Card card : VALUES) {
       if (card != Card.BACK) {

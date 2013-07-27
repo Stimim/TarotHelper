@@ -9,22 +9,23 @@
     tools:context=".MainActivity" >
 
     <TextView
-        android:id="@+id/buttonNewSpread"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="170dp"
-        android:text="@string/start"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/buttonViewCards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonNewSpread"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:text="@string/viewcards"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/buttonNewSpread"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="128dp"
+        android:text="@string/start"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
