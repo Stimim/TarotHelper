@@ -1,0 +1,93 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc"
+    tools:context=".ViewCardsActivity" >
+
+    <!--
+         The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc.
+    -->
+
+    <ScrollView
+        android:id="@+id/image_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="#000000"
+        android:scrollbars="horizontal|vertical" >
+
+        <ImageView
+            android:id="@+id/card_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/dummy_content"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:maxWidth="300dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/back"
+            android:text="@string/dummy_content" />
+
+    </ScrollView>
+
+    <!--
+         This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows.
+    -->
+
+    <LinearLayout
+        android:id="@+id/layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:background="#000000"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/button_major"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/descButtonMajor"
+            android:src="@drawable/small_ar00" />
+
+        <ImageView
+            android:id="@+id/button_cups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/descButtonCups"
+            android:src="@drawable/small_cuac" />
+
+        <ImageView
+            android:id="@+id/button_wands"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/descButtonWands"
+            android:src="@drawable/small_waac" />
+
+        <ImageView
+            android:id="@+id/button_swords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/descButtonSwords"
+            android:src="@drawable/small_swac" />
+
+        <ImageView
+            android:id="@+id/button_pentacles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/descButtonPentacles"
+            android:src="@drawable/small_peac" />
+    </LinearLayout>
+
+</FrameLayout>
