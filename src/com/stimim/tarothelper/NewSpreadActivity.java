@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.stimim.tarothelper.util.SystemUiHider;
 import com.stimim.tarothelper.view.PlayGroundView;
@@ -26,6 +28,13 @@ public class NewSpreadActivity extends Activity {
     setContentView(R.layout.activity_new_spread);
 
     mPlayGroundView = (PlayGroundView) findViewById(R.id.play_ground);
+
+    mPlayGroundView.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        NewSpreadActivity.this.openOptionsMenu();
+      }
+    });
   }
 
   @Override
