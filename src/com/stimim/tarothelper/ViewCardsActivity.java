@@ -9,7 +9,6 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -216,7 +215,6 @@ public class ViewCardsActivity extends Activity {
             // case MotionEvent.ACTION_POINTER_DOWN:
             singlePointDownX = event.getX();
             singlePointDownY = event.getY();
-            Log.d("ACTION DOWN", String.format("X: %f", event.getX()));
             return true;
             // case MotionEvent.ACTION_MOVE:
             // return true;
@@ -225,14 +223,11 @@ public class ViewCardsActivity extends Activity {
             float deltaY = event.getY() - singlePointDownY;
             float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            Log.d("ACTION UP", String.format("X: %f", event.getX()));
             if (deltaX > threshold) {
-              Log.d("ACTION UP", "Right!");
               // previous card
               setCard(mCard.prevCard());
               return true;
             } else if (deltaX < -threshold) {
-              Log.d("ACTION UP", "Left!");
               // next card
               setCard(mCard.nextCard());
               return true;

@@ -2,9 +2,11 @@ package com.stimim.tarothelper;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,27 +15,27 @@ import com.stimim.tarothelper.util.SystemUiHider;
 import com.stimim.tarothelper.view.PlayGroundView;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * An example full-screen activity that shows and hides the system UI (i.e. status bar and
+ * navigation/system bar) with user interaction.
  *
  * @see SystemUiHider
  */
 public class NewSpreadActivity extends Activity {
   /**
-   * Whether or not the system UI should be auto-hidden after
-   * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
+   * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS}
+   * milliseconds.
    */
   private static final boolean AUTO_HIDE = true;
 
   /**
-   * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user
-   * interaction before hiding the system UI.
+   * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before
+   * hiding the system UI.
    */
   private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
   /**
-   * If set, will toggle the system UI visibility upon interaction. Otherwise,
-   * will show the system UI visibility upon interaction.
+   * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system
+   * UI visibility upon interaction.
    */
   private static final boolean TOGGLE_ON_CLICK = true;
 
@@ -58,7 +60,6 @@ public class NewSpreadActivity extends Activity {
     final View controlsView = findViewById(R.id.new_spread_controls);
     mPlayGroundView = (PlayGroundView) findViewById(R.id.play_ground);
 
-    mPlayGroundView.drawCard();
     // Set up an instance of SystemUiHider to control the system UI for
     // this activity.
     mSystemUiHider = SystemUiHider.getInstance(this, mPlayGroundView, HIDER_FLAGS);
@@ -83,7 +84,7 @@ public class NewSpreadActivity extends Activity {
             mShortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
           }
           controlsView.animate().translationY(visible ? 0 : mControlsHeight)
-                  .setDuration(mShortAnimTime);
+              .setDuration(mShortAnimTime);
         } else {
           // If the ViewPropertyAnimator APIs aren't
           // available, simply show or hide the in-layout UI
@@ -128,6 +129,26 @@ public class NewSpreadActivity extends Activity {
         delayedHide(AUTO_HIDE_DELAY_MILLIS);
       }
     });
+
+    findViewById(R.id.button_screenshot).setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+
+        mPlayGroundView.takeScreenshot();
+      }
+    });
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    SharedPreferences sharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(getApplication());
+    boolean useReversedCards =
+        sharedPreferences.getBoolean(getString(R.string.pref_use_reversed_card_key), false);
+    mPlayGroundView.setCanReverseCards(useReversedCards);
   }
 
   @Override
@@ -141,9 +162,8 @@ public class NewSpreadActivity extends Activity {
   }
 
   /**
-   * Touch listener to use for in-layout UI controls to delay hiding the system
-   * UI. This is to prevent the jarring behavior of controls going away while
-   * interacting with activity UI.
+   * Touch listener to use for in-layout UI controls to delay hiding the system UI. This is to
+   * prevent the jarring behavior of controls going away while interacting with activity UI.
    */
   View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
     @Override
@@ -164,8 +184,7 @@ public class NewSpreadActivity extends Activity {
   };
 
   /**
-   * Schedules a call to hide() in [delay] milliseconds, canceling any
-   * previously scheduled calls.
+   * Schedules a call to hide() in [delay] milliseconds, canceling any previously scheduled calls.
    */
   private void delayedHide(int delayMillis) {
     mHideHandler.removeCallbacks(mHideRunnable);

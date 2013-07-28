@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
+            android:background="#000000"
             android:orientation="horizontal"
             tools:ignore="UselessParent" >
 
@@ -43,16 +43,24 @@
                 android:id="@+id/button_draw_card"
                 style="?buttonBarButtonStyle"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/draw_card" />
 
             <Button
                 android:id="@+id/button_clear"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/clear" />
+                android:text="@string/button_clear_text" />
+
+            <ImageButton
+                android:id="@+id/button_screenshot"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/take_screenshot"
+                android:src="@android:drawable/ic_menu_camera" />
 
         </LinearLayout>
     </FrameLayout>
