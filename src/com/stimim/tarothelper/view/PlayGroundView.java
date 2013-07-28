@@ -3,8 +3,10 @@ package com.stimim.tarothelper.view;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -296,7 +298,24 @@ public class PlayGroundView extends RelativeLayout {
     paint.setDither(true);
     paint.setFilterBitmap(true);
 
+    ArrayList<Entry<Card, CardAttribute>> list = new ArrayList<Entry<Card, CardAttribute>>();
     for (Entry<Card, CardAttribute> e : map.entrySet()) {
+      CardAttribute attr = e.getValue();
+      if (attr.getImageView() != null) {
+        list.add(e);
+      }
+    }
+
+    Collections.sort(list, new Comparator<Entry<Card, CardAttribute>>() {
+      @Override
+      public int compare(Entry<Card, CardAttribute> lhs, Entry<Card, CardAttribute> rhs) {
+        ImageView a = lhs.getValue().getImageView();
+        ImageView b = rhs.getValue().getImageView();
+        return PlayGroundView.this.indexOfChild(a) - PlayGroundView.this.indexOfChild(b);
+      }
+    });
+
+    for (Entry<Card, CardAttribute> e : list) {
       Card card = e.getKey();
       CardAttribute attr = e.getValue();
 
@@ -418,18 +437,20 @@ public class PlayGroundView extends RelativeLayout {
 
     /* Ask for a file name */
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
     final EditText editText = new EditText(getContext());
+    final String defaultName = "NoName";
+    editText.setText(defaultName);
 
-    editText.setText("Screenshot");
     builder.setView(editText)
+        .setTitle("Save as...")
+        .setMessage("Save current spread in SD card")
         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
             String filename = editText.getText().toString().trim();
 
             if (filename.isEmpty()) {
-              filename = "Screenshot";
+              filename = defaultName;
             }
 
             FileOutputStream output;
