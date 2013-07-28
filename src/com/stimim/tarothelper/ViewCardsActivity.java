@@ -196,6 +196,7 @@ public class ViewCardsActivity extends Activity {
     private float singlePointDownY;
     private final float threshold;
 
+    @SuppressWarnings("deprecation")
     public ImageTouchListener(Display display) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
         Point size = new Point();
@@ -212,12 +213,9 @@ public class ViewCardsActivity extends Activity {
       if (pointerCount == 1) {
         switch (event.getActionMasked()) {
           case MotionEvent.ACTION_DOWN:
-            // case MotionEvent.ACTION_POINTER_DOWN:
             singlePointDownX = event.getX();
             singlePointDownY = event.getY();
             return true;
-            // case MotionEvent.ACTION_MOVE:
-            // return true;
           case MotionEvent.ACTION_UP:
             float deltaX = event.getX() - singlePointDownX;
             float deltaY = event.getY() - singlePointDownY;

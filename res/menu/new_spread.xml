@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item 
+        android:id="@+id/action_draw_a_card"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/action_draw_a_card" />
+    
+    <item
+        android:id="@+id/action_clear_play_ground"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/action_clear_play_ground" />
+    <item
+        android:id="@+id/action_take_screenshot"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="@string/action_take_screenshot" />
+</menu>

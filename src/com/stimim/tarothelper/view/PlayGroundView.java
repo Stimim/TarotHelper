@@ -400,7 +400,7 @@ public class PlayGroundView extends RelativeLayout {
   private static ImageView makeReversed(ImageView imageView) {
     imageView.setScaleType(ScaleType.MATRIX);
     Matrix matrix = new Matrix(imageView.getImageMatrix());
-    matrix.setRotate(180, imageView.getWidth() / 2, imageView.getHeight() / 2);
+    matrix.postRotate(180, imageView.getWidth() / 2, imageView.getHeight() / 2);
     imageView.setImageMatrix(matrix);
     imageView.requestLayout();
     return imageView;
