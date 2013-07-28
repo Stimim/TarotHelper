@@ -288,6 +288,9 @@ public class PlayGroundView extends RelativeLayout {
       switch (event.getActionMasked()) {
         case MotionEvent.ACTION_DOWN:
           selectedCard = viewToCard.get(v);
+          if (selectedCard != null) {
+            v.bringToFront();
+          }
       }
       return false;
     }
