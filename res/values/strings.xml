@@ -26,5 +26,6 @@
     <string name="action_draw_a_card">Draw</string>
     <string name="action_clear_play_ground">Clear</string>
     <string name="action_take_screenshot">Save</string>
+    <string name="action_show_base_card">Base Card</string>
     
 </resources>

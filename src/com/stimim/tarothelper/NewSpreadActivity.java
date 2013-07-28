@@ -63,6 +63,9 @@ public class NewSpreadActivity extends Activity {
       case R.id.action_take_screenshot:
         mPlayGroundView.takeScreenshot();
         return true;
+      case R.id.action_show_base_card:
+        mPlayGroundView.showBaseCard();
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }

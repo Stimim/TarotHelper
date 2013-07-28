@@ -12,6 +12,7 @@ import java.util.Random;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -24,6 +25,7 @@ import android.os.Environment;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
@@ -32,10 +34,11 @@ import android.widget.Toast;
 import com.stimim.tarothelper.card.Card;
 
 public class PlayGroundView extends RelativeLayout {
-  HashMap<Card, CardAttribute> map;
-  HashMap<ImageView, Card> viewToCard;
+  private HashMap<Card, CardAttribute> map;
+  private HashMap<ImageView, Card> viewToCard;
 
-  List<Card> undrawedCards;
+  private List<Card> undrawedCards;
+  private Card baseCard;
   private boolean canReverseCards;
   private final Random random;
   private int nextIndex;
@@ -154,6 +157,8 @@ public class PlayGroundView extends RelativeLayout {
     Collections.shuffle(undrawedCards);
     nextIndex = 0;
 
+    baseCard = undrawedCards.get(undrawedCards.size() - 1);
+
     setOnTouchListener(myOnTouchListener);
   }
 
@@ -190,30 +195,33 @@ public class PlayGroundView extends RelativeLayout {
       layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
     }
 
+    public void showInDialog() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+      ImageView largeImage = new ImageView(getContext());
+
+      builder.setView(largeImage);
+
+      largeImage.setImageResource(card.imageNormal);
+
+      if (reversed) {
+        Bitmap normal = BitmapFactory.decodeResource(getResources(), card.imageNormal);
+        Matrix matrix = new Matrix();
+        matrix.setRotate(180, normal.getWidth() / 2, normal.getHeight() / 2);
+        normal =
+            Bitmap.createBitmap(normal, 0, 0, normal.getWidth(), normal.getHeight(), matrix, true);
+        largeImage.setImageBitmap(normal);
+      }
+
+      builder.show();
+
+    }
+
     public void onClick() {
       if (!revealed) {
         reveal();
       } else {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-        RelativeLayout layout = new RelativeLayout(getContext());
-        ImageView largeImage = new ImageView(getContext());
-        largeImage.setImageResource(card.imageNormal);
-
-        RelativeLayout.LayoutParams params =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        layout.addView(largeImage, params);
-
-        // if (reversed) {
-        //  makeReversed(largeImage);
-        // }
-
-        layout.requestLayout();
-
-        builder.setView(layout);
-        builder.show();
+        showInDialog();
       }
     }
 
@@ -283,19 +291,77 @@ public class PlayGroundView extends RelativeLayout {
     }
   };
 
-  public void takeScreenshot() {
+  private void takeScreenshotPhase2(ScreenshotBundle bundle) {
+    Paint paint = new Paint();
+    paint.setDither(true);
+    paint.setFilterBitmap(true);
+
+    for (Entry<Card, CardAttribute> e : map.entrySet()) {
+      Card card = e.getKey();
+      CardAttribute attr = e.getValue();
+
+      if (attr.getImageView() == null) {
+        continue;
+      }
+
+      ImageView image = attr.getImageView();
+      float left = image.getLeft() - bundle.left;
+      float top = image.getTop() - bundle.top;
+      left = left * bundle.scaleSmall2Normal * bundle.scaleNormal2Real;
+      top = top * bundle.scaleSmall2Normal * bundle.scaleNormal2Real;
+
+      Bitmap normal = BitmapFactory.decodeResource(getResources(), card.imageNormal);
+
+      Rect src = new Rect(0, 0, normal.getWidth(), normal.getHeight());
+      Rect dst = new Rect(0, 0,
+          (int) (normal.getWidth() * bundle.scaleNormal2Real),
+          (int) (normal.getHeight() * bundle.scaleNormal2Real));
+
+      if (attr.isReversed()) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(180, normal.getWidth() / 2, normal.getHeight() / 2);
+        normal =
+            Bitmap.createBitmap(normal, 0, 0, normal.getWidth(), normal.getHeight(), matrix, true);
+      }
+
+      int saveCount = bundle.canvas.getSaveCount();
+      bundle.canvas.save();
+      bundle.canvas.translate(left, top);
+      bundle.canvas.drawBitmap(normal, src, dst, paint);
+      bundle.canvas.restoreToCount(saveCount);
+    }
+
+    if (!bundle.bitmap.compress(CompressFormat.PNG, 95, bundle.output)) {
+      Toast.makeText(getContext(), "Failed to save file", Toast.LENGTH_SHORT).show();
+    }
+
+    Toast.makeText(getContext(), "Screenshot saved", Toast.LENGTH_SHORT).show();
+  }
+
+  public void showBaseCard() {
+    CardAttribute attribute = map.get(baseCard);
+
+    if (attribute != null) {
+      attribute.showInDialog();
+    }
+  }
+
+  private void takeScreenshotPhase1() {
+    /* Check if we can write to SD card */
     String state = Environment.getExternalStorageState();
     if (!Environment.MEDIA_MOUNTED.equals(state)) {
-      Toast.makeText(getContext(), "Can't find any writable external storages", Toast.LENGTH_LONG)
-          .show();
+      Toast.makeText(getContext(), "Can't find any writable external storages",
+          Toast.LENGTH_LONG).show();
       return;
     }
 
+    /* compute size */
     int bLeft = -1;
     int bTop = -1;
     int bRight = -1;
     int bBottom = -1;
-    float scale = -1;
+    float bScaleSmall2Normal = -1;
+    float bScaleNormal2Real = 1;
 
     for (Entry<Card, CardAttribute> e : map.entrySet()) {
       CardAttribute attr = e.getValue();
@@ -321,11 +387,11 @@ public class PlayGroundView extends RelativeLayout {
         bBottom = image.getBottom();
       }
 
-      if (scale < 0) {
+      if (bScaleSmall2Normal < 0) {
         int sH = BitmapFactory.decodeResource(getResources(), card.imageSmall).getHeight();
         int nH = BitmapFactory.decodeResource(getResources(), card.imageNormal).getHeight();
 
-        scale = (float) nH / (float) sH;
+        bScaleSmall2Normal = (float) nH / (float) sH;
       }
     }
 
@@ -333,68 +399,67 @@ public class PlayGroundView extends RelativeLayout {
       return;
     }
 
-    FileOutputStream output;
-    try {
-      File file =
-          new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-              "TarotHelperScreenshot.png");
-      output = new FileOutputStream(file);
-    } catch (FileNotFoundException e) {
-      Toast.makeText(getContext(), "Can't open a writable file.", Toast.LENGTH_SHORT).show();
-      return;
+    int width = (int) ((bRight - bLeft) * bScaleSmall2Normal);
+    int height = (int) ((bBottom - bTop) * bScaleSmall2Normal);
+
+    if (width * height > 786432) {
+      bScaleNormal2Real = (float) Math.sqrt(786432.0 / (width * height));
+
+      width = (int) (width * bScaleNormal2Real);
+      height = (int) (height * bScaleNormal2Real);
     }
 
+    final int left = bLeft;
+    final int top = bTop;
+    final float scaleSmall2Normal = bScaleSmall2Normal;
+    final float scaleNormal2Real = bScaleNormal2Real;
+    final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+    final Canvas canvas = new Canvas(bitmap);
 
-    int width = (int) ((bRight - bLeft) * scale);
-    int height = (int) ((bBottom - bTop) * scale);
+    /* Ask for a file name */
+    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-    Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-    Canvas canvas = new Canvas(bitmap);
+    final EditText editText = new EditText(getContext());
 
-    Paint paint = new Paint();
-    paint.setDither(true);
-    paint.setFilterBitmap(true);
+    editText.setText("Screenshot");
+    builder.setView(editText)
+        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            String filename = editText.getText().toString().trim();
 
-    for (Entry<Card, CardAttribute> e : map.entrySet()) {
-      Card card = e.getKey();
-      CardAttribute attr = e.getValue();
+            if (filename.isEmpty()) {
+              filename = "Screenshot";
+            }
 
-      if (attr.getImageView() == null) {
-        continue;
-      }
+            FileOutputStream output;
+            try {
+              File file = new File(
+                  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                  filename + ".png");
+              output = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+              Toast.makeText(getContext(),
+                  "Can't open a writable file.", Toast.LENGTH_SHORT).show();
+              return;
+            }
 
-      ImageView image = attr.getImageView();
-      float left = image.getLeft() - bLeft;
-      float top = image.getTop() - bTop;
-      left = left * scale;
-      top = top * scale;
+            ScreenshotBundle bundle =
+                new ScreenshotBundle(output, canvas, bitmap, left, top, scaleSmall2Normal,
+                    scaleNormal2Real);
 
-      Bitmap normal = BitmapFactory.decodeResource(getResources(), card.imageNormal);
+            dialog.dismiss();
 
-      Rect src = new Rect(0, 0, normal.getWidth(), normal.getHeight());
+            Toast.makeText(getContext(),
+                "Saving to " + filename + ".png", Toast.LENGTH_LONG).show();
+            takeScreenshotPhase2(bundle);
+          }
+        });
+    builder.create().show();
+  }
 
-      if (attr.isReversed()) {
-        Matrix matrix = new Matrix();
-        if (attr.isReversed()) {
-          matrix.setRotate(180, normal.getWidth() / 2, normal.getHeight() / 2);
-        }
-        normal =
-            Bitmap.createBitmap(normal, 0, 0, normal.getWidth(), normal.getHeight(), matrix, true);
-      }
-
-      int saveCount = canvas.getSaveCount();
-      canvas.save();
-      canvas.translate(left, top);
-      canvas.drawBitmap(normal, src, src, paint);
-      canvas.restoreToCount(saveCount);
-    }
-
-    if (!bitmap.compress(CompressFormat.PNG, 95, output)) {
-      Toast.makeText(getContext(), "Failed to save file", Toast.LENGTH_SHORT).show();
-    }
-
-    Toast.makeText(getContext(), "Screenshot saved", Toast.LENGTH_SHORT).show();
-    return;
+  public void takeScreenshot() {
+    takeScreenshotPhase1();
   }
 
   private static ImageView makeReversed(ImageView imageView) {
@@ -404,5 +469,29 @@ public class PlayGroundView extends RelativeLayout {
     imageView.setImageMatrix(matrix);
     imageView.requestLayout();
     return imageView;
+  }
+
+  /**
+   * Everything you need to take a screenshot
+   */
+  private class ScreenshotBundle {
+    FileOutputStream output;
+    Canvas canvas;
+    Bitmap bitmap;
+    int left;
+    int top;
+    float scaleSmall2Normal;
+    float scaleNormal2Real;
+
+    ScreenshotBundle(FileOutputStream output,
+        Canvas canvas, Bitmap bitmap, int left, int top, float scaleS2N, float scaleN2R) {
+      this.output = output;
+      this.canvas = canvas;
+      this.bitmap = bitmap;
+      this.left = left;
+      this.top = top;
+      this.scaleSmall2Normal = scaleS2N;
+      this.scaleNormal2Real = scaleN2R;
+    }
   }
 }
