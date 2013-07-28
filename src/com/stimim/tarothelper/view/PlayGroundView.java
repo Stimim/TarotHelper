@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -23,6 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -296,7 +299,7 @@ public class PlayGroundView extends RelativeLayout {
     }
   };
 
-  private void takeScreenshotPhase2(ScreenshotBundle bundle) {
+  private void takeScreenshotPhase2(final ScreenshotBundle bundle, Activity invoker) {
     Paint paint = new Paint();
     paint.setDither(true);
     paint.setFilterBitmap(true);
@@ -357,7 +360,16 @@ public class PlayGroundView extends RelativeLayout {
       Toast.makeText(getContext(), "Failed to save file", Toast.LENGTH_SHORT).show();
     }
 
-    Toast.makeText(getContext(), "Screenshot saved", Toast.LENGTH_SHORT).show();
+    invoker.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(getContext(), "Screenshot saved", Toast.LENGTH_SHORT).show();
+
+        getContext().sendBroadcast(
+            new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                Uri.parse("file://" + bundle.filepath)));
+      }
+    });
   }
 
   public void showBaseCard() {
@@ -368,7 +380,7 @@ public class PlayGroundView extends RelativeLayout {
     }
   }
 
-  private void takeScreenshotPhase1() {
+  private void takeScreenshotPhase1(final Activity invoker) {
     /* Check if we can write to SD card */
     String state = Environment.getExternalStorageState();
     if (!Environment.MEDIA_MOUNTED.equals(state)) {
@@ -456,9 +468,10 @@ public class PlayGroundView extends RelativeLayout {
               filename = defaultName;
             }
 
+            File file;
             FileOutputStream output;
             try {
-              File file = new File(
+              file = new File(
                   Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                   filename + ".png");
               output = new FileOutputStream(file);
@@ -468,22 +481,32 @@ public class PlayGroundView extends RelativeLayout {
               return;
             }
 
-            ScreenshotBundle bundle =
-                new ScreenshotBundle(output, canvas, bitmap, left, top, scaleSmall2Normal,
+            final String msg = "Saving to " + filename + ".png";
+            final ScreenshotBundle bundle =
+                new ScreenshotBundle(output, file.getAbsolutePath(),
+                    canvas, bitmap, left, top, scaleSmall2Normal,
                     scaleNormal2Real);
 
             dialog.dismiss();
 
-            Toast.makeText(getContext(),
-                "Saving to " + filename + ".png", Toast.LENGTH_LONG).show();
-            takeScreenshotPhase2(bundle);
+            Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+
+            Thread thread = new Thread(new Runnable() {
+              @Override
+              public void run() {
+                takeScreenshotPhase2(bundle, invoker);
+              }
+            });
+            thread.start();
           }
         });
     builder.create().show();
   }
 
-  public void takeScreenshot() {
-    takeScreenshotPhase1();
+  public void takeScreenshot(final Activity invoker) {
+    synchronized(invoker) {
+      takeScreenshotPhase1(invoker);
+    }
   }
 
   private static ImageView makeReversed(ImageView imageView) {
@@ -500,6 +523,7 @@ public class PlayGroundView extends RelativeLayout {
    */
   private class ScreenshotBundle {
     FileOutputStream output;
+    String filepath;
     Canvas canvas;
     Bitmap bitmap;
     int left;
@@ -507,8 +531,9 @@ public class PlayGroundView extends RelativeLayout {
     float scaleSmall2Normal;
     float scaleNormal2Real;
 
-    ScreenshotBundle(FileOutputStream output,
+    ScreenshotBundle(FileOutputStream output, String filepath,
         Canvas canvas, Bitmap bitmap, int left, int top, float scaleS2N, float scaleN2R) {
+      this.filepath = filepath;
       this.output = output;
       this.canvas = canvas;
       this.bitmap = bitmap;

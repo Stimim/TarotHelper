@@ -70,7 +70,7 @@ public class NewSpreadActivity extends Activity {
         mPlayGroundView.reset();
         return true;
       case R.id.action_take_screenshot:
-        mPlayGroundView.takeScreenshot();
+        mPlayGroundView.takeScreenshot(this);
         return true;
       case R.id.action_show_base_card:
         mPlayGroundView.showBaseCard();
