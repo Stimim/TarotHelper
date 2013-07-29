@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-  TextView buttonNewSpread;
+  TextView buttonDrawCards;
   TextView buttonViewCards;
 
   @Override
@@ -19,11 +19,11 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    buttonNewSpread = (TextView) findViewById(R.id.button_new_spread);
-    buttonNewSpread.setOnClickListener(new OnClickListener() {
+    buttonDrawCards = (TextView) findViewById(R.id.button_draw_cards);
+    buttonDrawCards.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent newIntent = new Intent(view.getContext(), NewSpreadActivity.class);
+        Intent newIntent = new Intent(view.getContext(), DrawCardsActivity.class);
         startActivity(newIntent);
       }
     });

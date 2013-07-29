@@ -12,20 +12,20 @@
         android:id="@+id/button_view_cards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button_new_spread"
+        android:layout_below="@+id/button_draw_cards"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:text="@string/viewcards"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/button_new_spread"
+        android:id="@+id/button_draw_cards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
-        android:text="@string/start"
+        android:text="@string/drawcards"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

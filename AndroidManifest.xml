@@ -24,9 +24,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.stimim.tarothelper.NewSpreadActivity"
+            android:name="com.stimim.tarothelper.DrawCardsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_new_spread"
+            android:label="@string/title_activity_draw_cards"
             android:theme="@style/FullscreenTheme" >
         </activity>
         <activity

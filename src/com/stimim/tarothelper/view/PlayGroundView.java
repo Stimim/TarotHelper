@@ -134,6 +134,12 @@ public class PlayGroundView extends RelativeLayout {
           h -= attr.getImageView().getHeight();
           x -= attr.getImageView().getWidth() / 2;
           y -= attr.getImageView().getHeight() / 2;
+          if (x < 0) {
+            x = 0;
+          }
+          if (y < 0) {
+            y = 0;
+          }
 
           attr.placeCard(Math.min(x, w), Math.min(y, h));
 
@@ -177,7 +183,7 @@ public class PlayGroundView extends RelativeLayout {
       CardAttribute attribute = map.get(card);
       attribute.placeCard(x, y);
     } else {
-      Toast toast = Toast.makeText(getContext(), "The deck is empty!", Toast.LENGTH_LONG);
+      Toast toast = Toast.makeText(getContext(), "The deck is empty!", Toast.LENGTH_SHORT);
       toast.show();
     }
   }
@@ -385,7 +391,7 @@ public class PlayGroundView extends RelativeLayout {
     String state = Environment.getExternalStorageState();
     if (!Environment.MEDIA_MOUNTED.equals(state)) {
       Toast.makeText(getContext(), "Can't find any writable external storages",
-          Toast.LENGTH_LONG).show();
+          Toast.LENGTH_SHORT).show();
       return;
     }
 
@@ -489,7 +495,7 @@ public class PlayGroundView extends RelativeLayout {
 
             dialog.dismiss();
 
-            Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
             Thread thread = new Thread(new Runnable() {
               @Override
