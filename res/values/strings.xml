@@ -9,23 +9,23 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_view_cards">View Cards</string>
     
-    <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="descButtonMajor">Goto The Fool</string>
     <string name="descButtonCups">Goto Ace of Cups</string>
     <string name="descButtonWands">Goto Ace of Wands</string>
     <string name="descButtonSwords">Goto Ace of Swords</string>
     <string name="descButtonPentacles">Goto Ace of Pentacles</string>
-    <string name="use_reversed_cards">Use Reversed Cards</string>
-    <string name="button_clear_text">Clear</string>
     <string name="pref_use_reversed_card">Use Reversed Cards</string>
     <string name="pref_use_reversed_card_summ">If on, cards may be reversed.</string>
     <string name="pref_use_reversed_card_key">pref_use_reversed_card</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_draw_a_card">Draw</string>
+    <string name="action_choose_a_card">Choose</string>
     <string name="action_clear_play_ground">Clear</string>
     <string name="action_take_screenshot">Save</string>
     <string name="action_show_base_card">Base Card</string>
+    <string name="action_shuffle_cards">Shuffle</string>
     
+    <string name="title_dialog_choose_card">Choose a Card</string>
 </resources>

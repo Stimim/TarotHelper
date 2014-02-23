@@ -1,5 +1,7 @@
 package com.stimim.tarothelper.card;
 
+import java.util.ArrayList;
+
 import com.stimim.tarothelper.R;
 
 public enum Card {
@@ -125,5 +127,23 @@ public enum Card {
     }
 
     return array;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
+  public static String[] toString(ArrayList<Card> cards) {
+    if (cards.size() == 0) {
+      return null;
+    }
+
+    String[] strings = new String[cards.size()];
+
+    for (int i = 0; i < strings.length; ++ i) {
+      strings[i] = cards.get(i).toString();
+    }
+    return strings;
   }
 }

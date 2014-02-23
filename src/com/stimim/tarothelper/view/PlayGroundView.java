@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -159,38 +158,70 @@ public class PlayGroundView extends RelativeLayout {
       viewToCard = new HashMap<ImageView, Card>();
     }
 
-    undrawedCards = Arrays.asList(Card.tarotCards());
+    undrawedCards = new ArrayList<Card>();
+    Collections.addAll(undrawedCards, Card.tarotCards());
+//    undrawedCards = Arrays.asList(Card.tarotCards());
     for (Card card : undrawedCards) {
       map.put(card, new CardAttribute(card));
     }
     viewToCard.clear();
 
-    Collections.shuffle(undrawedCards);
-    nextIndex = 0;
+    shuffleCards();
 
     baseCard = undrawedCards.get(undrawedCards.size() - 1);
 
     setOnTouchListener(myOnTouchListener);
   }
 
-  public void drawCard() {
-    drawCard(0, 0);
+  public boolean chooseCard(Card card, boolean reversed) {
+    CardAttribute attr = map.get(card);
+    attr.reversed = reversed;
+    return chooseCard(card, 0, 0);
   }
 
-  public void drawCard(int x, int y) {
-    if (nextIndex < undrawedCards.size()) {
-      Card card = undrawedCards.get(nextIndex++);
-      CardAttribute attribute = map.get(card);
-      attribute.placeCard(x, y);
-    } else {
-      Toast toast = Toast.makeText(getContext(), "The deck is empty!", Toast.LENGTH_SHORT);
-      toast.show();
+  public boolean chooseCard(Card card, int x, int y) {
+    CardAttribute attr = map.get(card);
+    if (!attr.onboard) {
+      attr.placeCard(x, y);
+      return true;
     }
+    return false;
+  }
+
+  public boolean drawCard() {
+    return drawCard(0, 0);
+  }
+
+  public boolean drawCard(int x, int y) {
+    while (nextIndex < undrawedCards.size()) {
+      Card card = undrawedCards.get(nextIndex++);
+      if (chooseCard(card, x, y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void shuffleCards() {
+    Collections.shuffle(undrawedCards);
+    nextIndex = 0;
+  }
+
+  public ArrayList<Card> getUndrawedCards() {
+    ArrayList<Card> retval = new ArrayList<Card>();
+    for (CardAttribute attr : map.values()) {
+      if (!attr.onboard) {
+        retval.add(attr.card);
+      }
+    }
+    Collections.sort(retval);
+    return retval;
   }
 
   class CardAttribute {
     private boolean revealed;
-    private final boolean reversed;
+    private boolean reversed;
+    private boolean onboard;
     private ImageView imageView;
     private final Card card;
     private final RelativeLayout.LayoutParams layoutParams;
@@ -198,6 +229,7 @@ public class PlayGroundView extends RelativeLayout {
     CardAttribute(Card card) {
       reversed = canReverseCards ? random.nextBoolean() : false;
       revealed = false;
+      onboard = false;
       this.card = card;
 
       layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -284,6 +316,7 @@ public class PlayGroundView extends RelativeLayout {
       layoutParams.setMargins(x, y, 0, 0);
       imageView.setLayoutParams(layoutParams);
       imageView.requestLayout();
+      onboard = true;
     }
 
     public ImageView getImageView() {
@@ -380,9 +413,10 @@ public class PlayGroundView extends RelativeLayout {
 
   public void showBaseCard() {
     CardAttribute attribute = map.get(baseCard);
-
     if (attribute != null) {
       attribute.showInDialog();
+    } else {
+      Toast.makeText(getContext(), "base card is null", Toast.LENGTH_SHORT).show();
     }
   }
 
